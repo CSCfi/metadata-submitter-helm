@@ -1,0 +1,46 @@
+{{- if .Values.mongo.create }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-{{ template "sda.fullname" . }}
+spec:
+  selector:
+    matchLabels:
+      app: mongo-{{ template "sda.fullname" . }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mongo-{{ template "sda.fullname" . }}
+    spec:
+      containers:
+      - name: mongo
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-mongo
+              key: MONGO_ROOT_USERNAME
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-mongo
+              key: MONGO_ROOT_PASSWORD
+        image: {{ template "image.registry" . }}{{ .Values.mongo.image.name }}:{{ .Values.mongo.image.tag }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 27017
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+        - mountPath: /data/db
+          name: data
+      restartPolicy: Always
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: data
+        persistentVolumeClaim:
+          claimName: mongo-{{ template "sda.fullname" . }}
+{{- end }}

@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "sda.fullname" . }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "sda.fullname" . }}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ template "sda.fullname" . }}
+    spec:
+      containers:
+      - name: {{ template "sda.fullname" . }}
+        image: {{ template "image.registry" . }}{{ .Values.image.name }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        securityContext:
+          allowPrivilegeEscalation: false
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-mongo
+              key: MONGO_ROOT_USERNAME
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-mongo
+              key: MONGO_ROOT_PASSWORD
+        - name: MONGODB_HOST
+          value: "mongo-{{ template "sda.fullname" . }}:{{ .Values.mongo.port }}"
+        - name: BASE_URL
+          value: "{{ template "ingress.url" }}"
+        - name: AUTH_REFERER
+          value: "{{ .Values.auth.idpReferer }}"
+        - name: JWK_URL
+          value: "{{ .Values.auth.jwk }}"
+        - name: ISS_URL
+          value: "{{ .Values.auth.url }}"
+        - name: OIDC_URL
+          value: "{{ .Values.auth.oidc }}"
+        - name: AAI_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-aai
+              key: secret
+        - name: AAI_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-aai
+              key: id
+        - name: LOG_LEVEL
+          value: "{{ .Values.logLevel }}"
+        ports:
+        - name: webapp
+          containerPort: 5430
+        volumeMounts:
+        - name: tmp
+          mountPath: "/tmp"
+      volumes:
+      - name: tmp
+        emptyDir: {}
