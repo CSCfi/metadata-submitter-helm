@@ -19,13 +19,13 @@ spec:
         - name: MONGO_INITDB_ROOT_USERNAME
           valueFrom:
             secretKeyRef:
-              name: {{ template "sda.fullname" . }}-mongo
-              key: MONGO_ROOT_USERNAME
+              name: {{ template "sda.fullname" . }}-db
+              key: INITDB_ROOT_USERNAME
         - name: MONGO_INITDB_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "sda.fullname" . }}-mongo
-              key: MONGO_ROOT_PASSWORD
+              name: {{ template "sda.fullname" . }}-db
+              key: INITDB_ROOT_PASSWORD
         image: {{ template "image.registry" . }}{{ .Values.mongo.image.name }}:{{ .Values.mongo.image.tag }}
         imagePullPolicy: IfNotPresent
         ports:

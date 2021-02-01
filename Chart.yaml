@@ -2,4 +2,4 @@ apiVersion: v2
 name: metadata-submitter
 description: A Helm chart for metadata submitter
 type: application
-version: 0.1
+version: "0.2"

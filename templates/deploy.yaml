@@ -11,6 +11,13 @@ spec:
     metadata:
       labels:
         app: {{ template "sda.fullname" . }}
+      annotations:
+        {{- if not .Values.vaultSecrets }}
+        checksum/secret: {{ include (print $.Template.BasePath "/db-secret.yaml") . | sha256sum }}
+        {{- end }}
+{{- if .Values.podAnnotations }}
+{{- toYaml .Values.podAnnotations | nindent 8 -}}
+{{- end }}
     spec:
       containers:
       - name: {{ template "sda.fullname" . }}
@@ -22,15 +29,15 @@ spec:
         - name: MONGO_INITDB_ROOT_USERNAME
           valueFrom:
             secretKeyRef:
-              name: {{ template "sda.fullname" . }}-mongo
-              key: MONGO_ROOT_USERNAME
+              name: {{ template "sda.fullname" . }}-db
+              key: INITDB_ROOT_USERNAME
         - name: MONGO_INITDB_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "sda.fullname" . }}-mongo
-              key: MONGO_ROOT_PASSWORD
+              name: {{ template "sda.fullname" . }}-db
+              key: INITDB_ROOT_PASSWORD
         - name: MONGODB_HOST
-          value: "mongo-{{ template "sda.fullname" . }}:{{ .Values.mongo.port }}"
+          value: "{{ .Values.dbConnection.hostname }}:{{ .Values.dbConnection.port }}"
         - name: BASE_URL
           value: "{{ template "ingress.url" }}"
         - name: AUTH_REFERER

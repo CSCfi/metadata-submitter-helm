@@ -12,14 +12,16 @@ image:
 
 mongo:
   create: true
-  hostname: mongo-metadata-submitter
-  port: 27017
   image:
     pullPolicy: IfNotPresent
     name: mongo
     tag: 4.2.3
   storageClass: ""
   storage: 100Mi
+
+dbConnection:
+  hostname: mongo-metadata-submitter
+  port: 27017
   username: "" # If username is left empty, random username will be used
   password: "" # If password is left empty, random password will be used
 
@@ -34,3 +36,5 @@ auth:
   jwk: ""
   url: ""
   oidc: ""
+  id: ""
+  secret: ""

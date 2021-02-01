@@ -7,9 +7,9 @@ metadata:
     app: mongo-{{ template "sda.fullname" . }}
 spec:
   ports:
-  - port: {{ .Values.mongo.port }}
+  - port: {{ .Values.dbConnection.port }}
     protocol: TCP
-    targetPort: {{ .Values.mongo.port }}
+    targetPort: {{ .Values.dbConnection.port }}
   selector:
     app: mongo-{{ template "sda.fullname" . }}
 {{- end }}
