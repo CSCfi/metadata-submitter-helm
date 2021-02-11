@@ -1,0 +1,15 @@
+{{- if .Values.mongo.create }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-{{ template "sda.fullname" . }}
+  labels:
+    app: mongo-{{ template "sda.fullname" . }}
+spec:
+  ports:
+  - port: {{ .Values.dbConnection.port }}
+    protocol: TCP
+    targetPort: {{ .Values.dbConnection.port }}
+  selector:
+    app: mongo-{{ template "sda.fullname" . }}
+{{- end }}

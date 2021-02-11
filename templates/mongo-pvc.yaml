@@ -1,0 +1,13 @@
+{{- if .Values.mongo.create }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mongo-{{ template "sda.fullname" . }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: {{ .Values.mongo.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.mongo.storage }}
+{{- end }}
