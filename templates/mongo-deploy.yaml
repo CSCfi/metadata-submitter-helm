@@ -12,9 +12,19 @@ spec:
     metadata:
       labels:
         app: mongo-{{ template "sda.fullname" . }}
+{{- if .Values.vaultSecrets }}
+      annotations:
+{{- toYaml .Values.mongoPodAnnotations | nindent 8 -}}
+{{- end }}
     spec:
+      serviceAccountName: metadata
       containers:
       - name: mongo
+{{- if .Values.mongoCommand }}
+        command:
+{{- toYaml .Values.mongoCommand | nindent 8 -}}
+{{- end }}
+{{- if not .Values.vaultSecrets }}
         env:
         - name: MONGO_INITDB_ROOT_USERNAME
           valueFrom:
@@ -26,6 +36,7 @@ spec:
             secretKeyRef:
               name: {{ template "sda.fullname" . }}-db
               key: INITDB_ROOT_PASSWORD
+      {{- end }}
         image: {{ template "image.registry" . }}{{ .Values.mongo.image.name }}:{{ .Values.mongo.image.tag }}
         imagePullPolicy: IfNotPresent
         ports:

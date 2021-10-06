@@ -19,13 +19,19 @@ spec:
 {{- toYaml .Values.podAnnotations | nindent 8 -}}
 {{- end }}
     spec:
+      serviceAccountName: metadata
       containers:
       - name: {{ template "sda.fullname" . }}
         image: {{ template "image.registry" . }}{{ .Values.image.name }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+{{- if .Values.command }}
+        command:
+{{- toYaml .Values.command | nindent 8 -}}
+{{- end }}
         securityContext:
           allowPrivilegeEscalation: false
         env:
+        {{- if not .Values.vaultSecrets }}
         - name: MONGO_INITDB_ROOT_USERNAME
           valueFrom:
             secretKeyRef:
@@ -36,6 +42,7 @@ spec:
             secretKeyRef:
               name: {{ template "sda.fullname" . }}-db
               key: INITDB_ROOT_PASSWORD
+        {{- end }}
         - name: MONGODB_HOST
           value: "{{ .Values.dbConnection.hostname }}:{{ .Values.dbConnection.port }}"
         - name: BASE_URL
@@ -48,6 +55,7 @@ spec:
           value: "{{ .Values.auth.url }}"
         - name: OIDC_URL
           value: "{{ .Values.auth.oidc }}"
+        {{- if not .Values.vaultSecrets }}
         - name: AAI_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
@@ -58,6 +66,7 @@ spec:
             secretKeyRef:
               name: {{ template "sda.fullname" . }}-aai
               key: id
+        {{- end }}
         - name: LOG_LEVEL
           value: "{{ .Values.logLevel }}"
         ports:
