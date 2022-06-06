@@ -7,8 +7,8 @@ logLevel: DEBUG
 image:
   pullPolicy: IfNotPresent
   registry: ""
-  name: cscfi/metadata-submitter
-  tag: v0.7.1
+  name: sds/metadata-submitter
+  tag: 0.13.1
 
 mongo:
   create: true
@@ -16,25 +16,36 @@ mongo:
     pullPolicy: IfNotPresent
     name: mongo
     tag: 4.2.3
-  storageClass: ""
+  storageClass: cinder
   storage: 100Mi
 
 dbConnection:
-  hostname: mongo-metadata-submitter
+  hostname: mongo
   port: 27017
   username: "" # If username is left empty, random username will be used
   password: "" # If password is left empty, random password will be used
 
 ingress:
   create: true
-  tls: false
+  tls: true
   certSecret: ""    # Name of the secret containing certificates. Required if ingress.create and ingress.tls set to true
-  hostname: localhost
+  hostname: ""
 
 auth:
-  idpReferer: ""
-  jwk: ""
   url: ""
+  redirect: ""
   oidc: ""
   id: ""
   secret: ""
+
+doi:
+  api: https://api.test.datacite.org/dois
+  prefix: ""
+  user: ""
+  key: ""
+  discovery: ""
+
+metax:
+  user: ""
+  pass: ""
+  url: ""
