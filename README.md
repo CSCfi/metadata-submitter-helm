@@ -13,9 +13,7 @@ In `values.yaml` file set following values:
 
 | Parameter | Explanation |
 | --------- |  ----------- |
-| `auth.idpReferer` | OIDC AUTH endpoint that redirects the request to the application |
 | `auth.url` | OIDC claim issuer URL |
-| `auth.jwk` | JWK endpoint |
 | `auth.oidc` | OIDC endpoint |
 | `auth.id` | OIDC client id |
 | `auth.secret` | OIDC client secret |

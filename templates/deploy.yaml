@@ -30,6 +30,8 @@ spec:
 {{- end }}
         securityContext:
           allowPrivilegeEscalation: false
+        # prevents pod from running
+        # command: ["sh", "-c", "tail -f /dev/null"]
         env:
         {{- if not .Values.vaultSecrets }}
         - name: MONGO_INITDB_ROOT_USERNAME
@@ -46,13 +48,9 @@ spec:
         - name: MONGODB_HOST
           value: "{{ .Values.dbConnection.hostname }}:{{ .Values.dbConnection.port }}"
         - name: BASE_URL
-          value: "{{ template "ingress.url" }}"
-        - name: AUTH_REFERER
-          value: "{{ .Values.auth.idpReferer }}"
-        - name: JWK_URL
-          value: "{{ .Values.auth.jwk }}"
-        - name: ISS_URL
           value: "{{ .Values.auth.url }}"
+        - name: REDIRECT_URL
+          value: "{{ .Values.auth.redirect }}"
         - name: OIDC_URL
           value: "{{ .Values.auth.oidc }}"
         {{- if not .Values.vaultSecrets }}
@@ -69,12 +67,48 @@ spec:
         {{- end }}
         - name: LOG_LEVEL
           value: "{{ .Values.logLevel }}"
+        - name: DOI_API
+          value: "{{ .Values.doi.api }}"
+        - name: DOI_PREFIX
+          value: "{{ .Values.doi.prefix }}"
+        - name: DOI_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-doi
+              key: user
+        - name: DOI_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-doi
+              key: key
+        - name: DOI_DISCOVERY
+          value: "{{ .Values.doi.discovery }}"
+        - name: METAX_URL
+          value: "{{ .Values.metax.url }}"
+        - name: METAX_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-metax
+              key: user
+        - name: METAX_PASS
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "sda.fullname" . }}-metax
+              key: password
         ports:
         - name: webapp
           containerPort: 5430
         volumeMounts:
         - name: tmp
           mountPath: "/tmp"
+        - mountPath: /app/private
+          name: private
+        - mountPath: /app/static
+          name: static
       volumes:
       - name: tmp
+        emptyDir: {}
+      - name: static
+        emptyDir: {}
+      - name: private
         emptyDir: {}
